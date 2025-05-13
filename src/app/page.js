@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [board, setBoard] = useState(["_", "_", "_", "_", "_", "_", "_", "_", "_"]);
   const [turn, setTurn] = useState("X");
+  const [winner, setWinner] = useState(null); // null | "X" | "O" | "Draw"
 
   useEffect(() => {
     calculateWinner();
@@ -34,19 +35,25 @@ export default function Home() {
   
     for (let [a, b, c] of lines) {
       if (board[a] !== "_" && board[a] === board[b] && board[a] === board[c]) {
-        alert("The winner is: " + board[a]);
+        setWinner(board[a]);
         return;
       }
     }
   
     isDraw();
   };
-
+  
   const isDraw = () => {
     if (board.every(cell => cell !== "_")) {
-      alert("It's a draw!");
+      setWinner("Draw");
     }
-  };  
+  };
+
+  const reset = () => {
+    setBoard(["_", "_", "_", "_", "_", "_", "_", "_", "_"]);
+    setWinner(null);
+    setTurn("X"); // or randomly choose
+  };
 
   return (
     <div className="grid grid-cols-3 gap-2 w-full max-w-[500px] aspect-square">
@@ -58,6 +65,21 @@ export default function Home() {
           prop={item}
         />
       ))}
+      {winner && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow text-center">
+            <h2 className="text-2xl font-bold white-text">
+              {winner === "Draw" ? "It's a Draw!" : `Player ${winner} Wins!`}
+            </h2>
+            <button
+              onClick={reset}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
